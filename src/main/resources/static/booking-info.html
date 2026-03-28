@@ -2,76 +2,346 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Thông tin & Thanh toán</title>
+  <title>Thông tin & Thanh toán – CauLongVui</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/css/momo-booking.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    /* Override shared body padding to allow centering */
+    body {
+      background: #f4f6f9;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    /* Keep navbar offset from shared.css */
+    body { padding-top: 68px; }
+
+
+    :root {
+      --green-dark:  #1a3c2e;
+      --green-main:  #2d8a4e;
+      --green-light: #3aad62;
+      --green-bg:    #f0faf4;
+      --text-dark:   #1a1a2e;
+      --text-muted:  #6b7280;
+      --border:      #e5e7eb;
+      --white:       #ffffff;
+    }
+
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background: #f4f6f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    /* ── Page wrapper ── */
+    .checkout-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 0;
+      max-width: 980px;
+      width: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.14);
+    }
+
+    /* ══════════════════════════════
+       LEFT PANEL — Booking Info
+    ══════════════════════════════ */
+    .left-panel {
+      background: var(--white);
+      padding: 40px 36px;
+    }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--green-main); font-weight: 600; font-size: 14px;
+      text-decoration: none; margin-bottom: 28px;
+      transition: opacity .2s;
+    }
+    .back-link:hover { opacity: 0.75; }
+
+    .left-panel h1 {
+      font-size: 28px; font-weight: 900;
+      color: var(--text-dark); margin-bottom: 6px;
+    }
+    .left-panel h1 span { color: var(--green-main); }
+    .left-panel .sub-title {
+      font-size: 14px; color: var(--text-muted); margin-bottom: 32px;
+    }
+
+    /* Court summary card */
+    .court-card {
+      background: var(--green-bg);
+      border: 1.5px solid #c3e6ce;
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+    .court-card-header {
+      display: flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 16px; color: var(--green-dark);
+      margin-bottom: 14px;
+    }
+    .court-card-header .icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--green-main); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .detail-rows { display: flex; flex-direction: column; gap: 10px; }
+    .detail-row {
+      display: flex; justify-content: space-between;
+      font-size: 14px; color: var(--text-muted);
+    }
+    .detail-row b { color: var(--text-dark); font-weight: 700; }
+
+    /* Total section */
+    .total-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 0;
+      border-top: 2px dashed var(--border);
+      margin-top: 8px;
+    }
+    .total-row .label { font-size: 15px; font-weight: 600; color: var(--text-dark); }
+    .total-row .amount {
+      font-size: 22px; font-weight: 900; color: var(--green-main);
+    }
+
+    /* ══════════════════════════════
+       RIGHT PANEL — Payment
+    ══════════════════════════════ */
+    .right-panel {
+      background: var(--green-dark);
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .right-panel h2 {
+      font-size: 24px; font-weight: 900;
+      color: var(--white); margin-bottom: 4px;
+    }
+    .right-panel h2 span { color: #6ee7a0; }
+    .right-panel .sub-title {
+      font-size: 13px; color: rgba(255,255,255,0.5);
+      margin-bottom: 28px;
+    }
+
+    /* Input fields */
+    .field-group { margin-bottom: 18px; }
+    .field-group label {
+      display: block; font-size: 12px; font-weight: 700;
+      color: rgba(255,255,255,0.55); letter-spacing: .6px;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .field-group label span.req { color: #f87171; }
+    .field-group input {
+      width: 100%; padding: 12px 16px;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 10px; color: #fff; font-size: 15px;
+      font-family: inherit; outline: none;
+      transition: border-color .2s, background .2s;
+    }
+    .field-group input::placeholder { color: rgba(255,255,255,0.3); }
+    .field-group input:focus {
+      border-color: #6ee7a0;
+      background: rgba(255,255,255,0.12);
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px; background: rgba(255,255,255,0.1);
+      margin: 20px 0;
+    }
+
+    /* Payment method selector */
+    .method-label {
+      font-size: 12px; font-weight: 700;
+      color: rgba(255,255,255,0.55); letter-spacing: .6px;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .method-cards {
+      display: flex; gap: 10px; margin-bottom: 24px;
+    }
+    .method-card {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      gap: 8px; padding: 11px 10px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 12px; cursor: pointer;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.6); font-weight: 700; font-size: 14px;
+      transition: all .2s;
+    }
+    .method-card img { height: 24px; object-fit: contain; border-radius: 4px; }
+    .method-card.selected {
+      border-color: #6ee7a0;
+      background: rgba(110,231,160,0.12);
+      color: #6ee7a0;
+    }
+
+    /* Checkout button */
+    .btn-checkout {
+      width: 100%; padding: 15px;
+      background: linear-gradient(135deg, var(--green-main), var(--green-light));
+      color: #fff; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 800; font-family: inherit;
+      cursor: pointer; transition: all .2s;
+      letter-spacing: .3px;
+    }
+    .btn-checkout:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-checkout:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    .btn-dev {
+      width: 100%; padding: 12px;
+      background: transparent;
+      color: rgba(255,200,0,.7); border: 1.5px solid rgba(255,200,0,.3);
+      border-radius: 12px; font-size: 13px; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: all .2s; margin-top: 10px;
+    }
+    .btn-dev:hover { background: rgba(255,200,0,.07); }
+
+    .secure-note {
+      text-align: center; font-size: 12px;
+      color: rgba(255,255,255,0.3); margin-top: 16px;
+    }
+    .secure-note span { color: #6ee7a0; }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .checkout-wrapper { grid-template-columns: 1fr; }
+      .left-panel { padding: 28px 20px; }
+      .right-panel { padding: 28px 20px; }
+    }
+  </style>
 </head>
 <body>
-  <div class="momo-header">
-    <a href="schedule.html" class="btn-back">❮</a>
-    <h2>THÔNG TIN & THANH TOÁN</h2>
-    <div style="width: 30px;"></div>
-  </div>
+<div id="header-placeholder"></div>
+<div id="toast-container"></div>
 
-  <div class="info-section">
-    <div class="info-title">🏢 Thông tin sân</div>
-    <div class="info-row"><span>Tên CLB: <b>Câu Lạc Bộ Cầu Lông CauLongVui</b></span></div>
-    <div class="info-row"><span>Địa chỉ: 123 Lê Duẩn, phường Hải Châu, quận Hải Châu, Đà Nẵng</span></div>
-  </div>
+<div style="display:flex; align-items:center; justify-content:center; padding:32px 16px 60px; min-height:calc(100vh - 68px);">
+  <div class="checkout-wrapper">
 
-  <div class="info-section light">
-    <div class="info-title">📅 Thông tin lịch đặt</div>
-    <div class="info-row"><span>Sân: <b id="t-court">—</b></span></div>
-    <div class="info-row"><span>Ngày: <b id="t-date">—</b></span></div>
-    <div class="info-row"><span>Tổng giờ: <b id="t-hour">0h30</b></span></div>
-    <div class="info-row"><span>Tổng tiền: <b id="t-price">—</b></span></div>
-  </div>
+    <!-- ═══════════════════ LEFT ═══════════════════ -->
+    <div class="left-panel">
+      <a href="schedule.html" class="back-link">← Chọn khung giờ khác</a>
 
-  <div class="info-section">
-    <div class="info-row" style="font-weight:bold; font-size:16px; margin: 15px 0;">
-      <span>Số tiền cần thanh toán</span>
-      <span id="t-pay" style="color:#f39c12">—</span>
+      <h1>Đặt sân <span>của bạn.</span></h1>
+      <p class="sub-title">Kiểm tra thông tin trước khi thanh toán</p>
+
+      <!-- Court info -->
+      <div class="court-card">
+        <div class="court-card-header">
+          <div class="icon">🏢</div>
+          Câu Lạc Bộ Cầu Lông CauLongVui
+        </div>
+        <div class="detail-rows">
+          <div class="detail-row"><span>Địa chỉ</span><b>Khu E Hutech, Q9, TP.HCM</b></div>
+        </div>
+      </div>
+
+      <!-- Booking details -->
+      <div class="detail-rows" style="margin-bottom: 8px;">
+        <div class="detail-row"><span>Sân</span>          <b id="t-court">—</b></div>
+        <div class="detail-row"><span>Ngày đặt</span>     <b id="t-date">—</b></div>
+        <div class="detail-row"><span>Tổng thời gian</span><b id="t-hour">—</b></div>
+        <div class="detail-row"><span>Giờ bắt đầu</span> <b id="t-start">—</b></div>
+        <div class="detail-row"><span>Giờ kết thúc</span><b id="t-end">—</b></div>
+      </div>
+
+      <!-- Total -->
+      <div class="total-row">
+        <span class="label">Tổng thanh toán</span>
+        <span class="amount" id="t-price">—</span>
+      </div>
     </div>
-  </div>
 
-  <div class="info-section light">
-    <div class="input-group">
-      <label>Tên của bạn *</label>
-      <input type="text" id="cus-name" class="form-control form-input" placeholder="Ví dụ: Nguyễn Văn A" />
-    </div>
-    <div class="input-group">
-      <label>Số điện thoại *</label>
-      <input type="tel" id="cus-phone" class="form-control form-input" placeholder="Ví dụ: 0987654321" />
-    </div>
-    <div class="input-group">
-      <label>Ghi chú cho chủ sân</label>
-      <input type="text" id="cus-note" class="form-control form-input" placeholder="Nhập ghi chú (Không bắt buộc)..." />
-    </div>
-  </div>
+    <!-- ═══════════════════ RIGHT ═══════════════════ -->
+    <div class="right-panel">
+      <h2>Thanh toán<span>.</span></h2>
+      <p class="sub-title">Điền thông tin & chọn phương thức thanh toán</p>
 
-  <div style="padding: 15px; color:#666; font-size:13px; margin-bottom: 70px;">
-    <i>⚠️ Thanh toán qua Ví MoMo — bạn sẽ được chuyển đến trang MoMo để quét QR và hoàn tất.</i>
-  </div>
+      <div class="field-group">
+        <label>Tên khách hàng <span class="req">*</span></label>
+        <input type="text" id="cus-name" placeholder="Ví dụ: Nguyễn Văn A" autocomplete="name" />
+      </div>
 
-  <div class="bottom-bar">
-    <button class="btn-next" id="payBtn" onclick="goToPay()">XÁC NHẬN & THANH TOÁN MOMO</button>
-    <button class="btn-next" style="background:#ff9800; margin-top:10px;" onclick="goToPay(true)">🛠 (DEV) BỎ QUA APP - TEST THÀNH CÔNG</button>
+      <div class="field-group">
+        <label>Số điện thoại <span class="req">*</span></label>
+        <input type="tel" id="cus-phone" placeholder="Ví dụ: 0987654321" autocomplete="tel" />
+      </div>
+
+      <div class="field-group">
+        <label>Ghi chú (không bắt buộc)</label>
+        <input type="text" id="cus-note" placeholder="Ghi chú cho chủ sân..." />
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="method-label">Phương thức thanh toán</div>
+      <div class="method-cards">
+        <label id="lbl-momo" class="method-card selected" onclick="selectMethod('momo')">
+          <input type="radio" name="payMethod" value="momo" checked hidden />
+          <img src="/uploads/Logo-MoMo-Square-768x768.webp" alt="MoMo" />
+          MoMo
+        </label>
+        <label id="lbl-vnpay" class="method-card" onclick="selectMethod('vnpay')">
+          <input type="radio" name="payMethod" value="vnpay" hidden />
+          <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Icon-VNPAY-QR.png" alt="VNPay" />
+          VNPay
+        </label>
+      </div>
+
+      <button class="btn-checkout" id="payBtn" onclick="goToPay()">Xác nhận & Thanh toán →</button>
+      <button class="btn-dev" onclick="goToPay(true)">🛠 Bỏ qua & Test thành công</button>
+
+      <p class="secure-note">Thanh toán được <span>bảo mật</span> bởi MoMo / VNPay</p>
+    </div>
   </div>
 
   <script>
-    // Đọc thông tin từ localStorage (lưu từ schedule.html)
-    const price     = parseInt(localStorage.getItem('bk_price') || '0');
-    const time      = localStorage.getItem('bk_time')      || '0h00';
-    const courtName = localStorage.getItem('bk_courtName') || 'San cau long';
-    const courtId   = localStorage.getItem('bk_courtId')   || '';
-    const dateStr   = localStorage.getItem('bk_date')      || new Date().toLocaleDateString('vi-VN');
+    // ── Đọc dữ liệu từ localStorage ──
+    const price     = parseInt(localStorage.getItem('bk_price')     || '0');
+    const time      = localStorage.getItem('bk_time')               || '0h00';
+    const courtName = localStorage.getItem('bk_courtName')          || 'Sân cầu lông';
+    const courtId   = localStorage.getItem('bk_courtId')            || '';
+    const dateStr   = localStorage.getItem('bk_date')               || new Date().toLocaleDateString('vi-VN');
+    const startTime = localStorage.getItem('bk_startTime')          || '—';
+    const endTime   = localStorage.getItem('bk_endTime')            || '—';
 
     document.getElementById('t-court').innerText = courtName;
     document.getElementById('t-date').innerText  = dateStr;
     document.getElementById('t-hour').innerText  = time;
+    document.getElementById('t-start').innerText = startTime;
+    document.getElementById('t-end').innerText   = endTime;
     document.getElementById('t-price').innerText = price.toLocaleString('vi-VN') + ' đ';
-    document.getElementById('t-pay').innerText   = price.toLocaleString('vi-VN') + ' đ';
 
+    // ── Tự động điền từ tài khoản đã đăng nhập ──
+    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    if (user) {
+      if (user.fullName) document.getElementById('cus-name').value  = user.fullName;
+      if (user.phone)    document.getElementById('cus-phone').value = user.phone;
+    }
+
+    // ── Phương thức thanh toán ──
+    let selectedMethod = 'momo';
+    function selectMethod(method) {
+      selectedMethod = method;
+      document.getElementById('lbl-momo').classList.toggle('selected',  method === 'momo');
+      document.getElementById('lbl-vnpay').classList.toggle('selected', method === 'vnpay');
+    }
+
+    // ── Thanh toán ──
     async function goToPay(devBypass = false) {
       const name  = document.getElementById('cus-name').value.trim();
       const phone = document.getElementById('cus-phone').value.trim();
@@ -79,24 +349,24 @@
 
       const payBtn = document.getElementById('payBtn');
       payBtn.disabled = true;
-      payBtn.textContent = 'Đang tạo thanh toán...';
+      payBtn.textContent = 'Đang xử lý...';
 
-      // Lưu thông tin khách hàng
-      localStorage.setItem('bk_name',  name);
-      localStorage.setItem('bk_phone', phone);
+      localStorage.setItem('bk_name',      name);
+      localStorage.setItem('bk_phone',     phone);
+      localStorage.setItem('bk_payMethod', selectedMethod);
 
       try {
-        // 1. Tạo booking trước
+        // 1. Tạo booking
         const bookingRes = await fetch('/api/bookings', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            courtId:      parseInt(courtId),
-            customerName: name,
+            courtId:       parseInt(courtId),
+            customerName:  name,
             customerPhone: phone,
             bookingDate:   localStorage.getItem('bk_dateRaw') || new Date().toISOString().split('T')[0],
-            startTime:     localStorage.getItem('bk_startTime') || '07:00',
-            endTime:       localStorage.getItem('bk_endTime')   || '09:00',
+            startTime:     startTime,
+            endTime:       endTime,
             totalPrice:    price,
             status:        'PENDING'
           })
@@ -107,42 +377,59 @@
         if (bookingJson.success && bookingJson.data) {
           bookingId = bookingJson.data.id;
           localStorage.setItem('bk_bookingId', bookingId);
+        } else {
+          alert('Lỗi tạo đặt sân: ' + (bookingJson.message || 'Không xác định'));
+          payBtn.disabled = false;
+          payBtn.textContent = 'Xác nhận & Thanh toán →';
+          return;
         }
 
+        // Dev bypass
         if (devBypass) {
-          // Bỏ qua gọi lên MoMo, tự giả lập MoMo trả kết quả thành công về hệ thống
           window.location.href = `/api/payment/momo-return?orderId=CLV-${bookingId}-DEVTEST&amount=${price}&resultCode=0&message=Success_Dev_Test&transId=9999999999`;
           return;
         }
 
-        // 2. Gọi API tạo MoMo payment
-        const momoRes = await fetch('/api/payment/momo', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            bookingId:    bookingId,
-            amount:       price,
-            courtName:    courtName,
-            customerName: name
-          })
-        });
-        const momoJson = await momoRes.json();
-
-        if (momoJson.success && momoJson.data && momoJson.data.payUrl) {
-          // Redirect tới trang thanh toán MoMo thật
-          window.location.href = momoJson.data.payUrl;
+        // 2a. VNPay
+        if (selectedMethod === 'vnpay') {
+          const res  = await fetch('/api/payment/vnpay', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bookingId, amount: price, courtName, customerName: name })
+          });
+          const json = await res.json();
+          if (json.success && json.data?.payUrl) {
+            window.location.href = json.data.payUrl;
+          } else {
+            alert('Lỗi VNPay: ' + (json.message || 'Không xác định'));
+            payBtn.disabled = false;
+            payBtn.textContent = 'Xác nhận & Thanh toán →';
+          }
         } else {
-          alert('Lỗi tạo thanh toán MoMo: ' + (momoJson.message || 'Không xác định'));
-          payBtn.disabled = false;
-          payBtn.textContent = 'XÁC NHẬN & THANH TOÁN MOMO';
+          // 2b. MoMo
+          const res  = await fetch('/api/payment/momo', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bookingId, amount: price, courtName, customerName: name })
+          });
+          const json = await res.json();
+          if (json.success && json.data?.payUrl) {
+            window.location.href = json.data.payUrl;
+          } else {
+            alert('Lỗi MoMo: ' + (json.message || 'Không xác định'));
+            payBtn.disabled = false;
+            payBtn.textContent = 'Xác nhận & Thanh toán →';
+          }
         }
       } catch (err) {
         console.error(err);
         alert('Lỗi kết nối: ' + err.message);
         payBtn.disabled = false;
-        payBtn.textContent = 'XÁC NHẬN & THANH TOÁN MOMO';
+        payBtn.textContent = 'Xác nhận & Thanh toán →';
       }
     }
   </script>
+</div><!-- end checkout-wrapper -->
+</div><!-- end page wrapper -->
+
+<script src="/js/app.js"></script>
 </body>
 </html>

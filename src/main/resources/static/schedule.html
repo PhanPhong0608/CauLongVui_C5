@@ -3,189 +3,322 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đặt lịch ngày trực quan</title>
-  <link rel="stylesheet" href="/css/momo-booking.css" />
+  <title>Đặt lịch trực quan – Cầu Lông Vui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
   <style>
-    .date-picker-bar {
-      background: #fff;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid #e0e0e0;
-      font-size: 14px;
+    /* ── Page layout ── */
+    .schedule-page { max-width: 100%; padding: 28px 24px 120px; }
+
+    .page-header {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
     }
-    .date-picker-bar label { font-weight: 600; color: #444; }
-    .date-picker-bar input[type=date] {
-      border: 1.5px solid #ccc; border-radius: 8px;
-      padding: 6px 12px; font-size: 14px; font-family: inherit;
-      outline: none; cursor: pointer;
+    .btn-back-page {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: var(--green); font-weight: 600; font-size: 14px;
+      text-decoration: none; transition: opacity .2s;
     }
-    .date-picker-bar input[type=date]:focus { border-color: #2d8a4e; }
+    .btn-back-page:hover { opacity: .7; }
+    .page-title { font-size: 22px; font-weight: 900; color: var(--dark); }
+
+    /* ── Controls bar ── */
+    .controls-bar {
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 20px; margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .court-chip {
+      background: var(--green-pale); color: var(--green);
+      font-size: 13px; font-weight: 700; padding: 6px 14px;
+      border-radius: 20px; display: flex; align-items: center; gap: 6px;
+    }
+    .date-field {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; font-weight: 600; color: var(--dark);
+    }
+    .date-field input[type=date] {
+      border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 7px 12px; font-size: 14px; font-family: inherit;
+      outline: none; cursor: pointer; color: var(--dark);
+      transition: border-color .2s;
+    }
+    .date-field input[type=date]:focus { border-color: var(--green); }
+
+    /* ── Legend ── */
+    .legend {
+      display: flex; gap: 20px; align-items: center;
+      font-size: 13px; color: var(--muted); font-weight: 500;
+      padding: 0 4px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .legend-dot {
+      width: 16px; height: 16px; border-radius: 4px;
+    }
+    .ld-empty    { background: #fff; border: 1.5px solid var(--border); }
+    .ld-booked   { background: #f87171; }
+    .ld-selected { background: #6ee7a0; border: 1.5px solid #15803d; }
+
+    /* ── Schedule grid ── */
+    .schedule-wrap {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: var(--shadow-sm); overflow-x: auto;
+    }
+    .schedule-table {
+      border-collapse: collapse; min-width: 1400px; width: 100%;
+    }
+    .schedule-table th, .schedule-table td {
+      border: 1px solid #e5e7eb; text-align: center;
+      padding: 0; height: 38px; min-width: 42px;
+    }
+    .schedule-table thead th {
+      background: var(--green); color: #fff;
+      font-size: 11px; font-weight: 600;
+      position: sticky; top: 0; z-index: 5;
+    }
+    .schedule-table thead th:first-child {
+      min-width: 80px; left: 0; z-index: 6;
+    }
+    .court-name-cell {
+      background: #f0faf4 !important; color: var(--green) !important;
+      font-size: 12px; font-weight: 800;
+      position: sticky; left: 0; z-index: 4;
+      border-right: 2px solid var(--green);
+    }
+    .slot-empty {
+      background: #fff; cursor: pointer; transition: background .12s;
+    }
+    .slot-empty:hover { background: #dcfce7; }
+    .slot-booked  { background: #fecaca; cursor: not-allowed; }
+    .slot-selected { background: #6ee7a0; cursor: pointer; }
+
+    /* ── Bottom bar ── */
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: #1a3c2e; color: #fff;
+      padding: 14px 24px; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; border-top-left-radius: 16px; border-top-right-radius: 16px;
+      box-shadow: 0 -6px 24px rgba(0,0,0,.2);
+    }
+    .bottom-summary { display: flex; flex-direction: column; gap: 2px; }
+    .bottom-summary .label { font-size: 12px; color: rgba(255,255,255,.55); font-weight: 500; }
+    .bottom-summary .value { font-size: 16px; font-weight: 900; color: #6ee7a0; }
+    .btn-next {
+      background: linear-gradient(135deg, #2d8a4e, #3aad62);
+      color: #fff; border: none; padding: 12px 32px;
+      font-size: 15px; font-weight: 800; cursor: pointer;
+      border-radius: 12px; font-family: inherit;
+      transition: all .2s; white-space: nowrap;
+    }
+    .btn-next:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    @media (max-width: 600px) {
+      .schedule-page { padding: 16px 12px 110px; }
+      .controls-bar { flex-direction: column; align-items: flex-start; }
+    }
   </style>
 </head>
 <body>
-  <div class="momo-header">
-    <a href="courts.html" class="btn-back">❮</a>
-    <h2>ĐẶT LỊCH TRỰC QUAN</h2>
-    <div style="width:30px;"></div>
+<div id="header-placeholder"></div>
+<div id="toast-container"></div>
+
+<div class="schedule-page">
+
+  <div class="page-header">
+    <a href="courts.html" class="btn-back-page">← Chọn sân khác</a>
+    <h1 class="page-title">Chọn khung giờ</h1>
   </div>
 
-  <!-- Chọn ngày -->
-  <div class="date-picker-bar">
-    <label>📅 Ngày đặt:</label>
-    <input type="date" id="datePicker" />
-    <span id="dateLabel" style="color:#2d8a4e; font-weight:700;"></span>
+  <!-- Controls -->
+  <div class="controls-bar">
+    <div class="court-chip">🏸 <span id="courtNameLabel">—</span></div>
+    <div class="date-field">
+      <label for="datePicker">📅 Ngày:</label>
+      <input type="date" id="datePicker" />
+      <span id="dateLabel" style="color:var(--green);font-weight:700;"></span>
+    </div>
+    <div class="legend" style="margin-left:auto;">
+      <div class="legend-item"><div class="legend-dot ld-empty"></div> Trống</div>
+      <div class="legend-item"><div class="legend-dot ld-booked"></div> Đã đặt</div>
+      <div class="legend-item"><div class="legend-dot ld-selected"></div> Đang chọn</div>
+    </div>
   </div>
 
-  <div class="status-bar">
-    <div><span class="status-dot s-empty"></span> Trống</div>
-    <div><span class="status-dot s-booked"></span> Đã đặt</div>
-    <div><span class="status-dot s-selected"></span> Đang chọn</div>
-  </div>
-
-  <div class="schedule-container">
-    <table class="schedule-table" id="grid">
+  <!-- Grid -->
+  <div class="schedule-wrap">
+    <table class="schedule-table" id="scheduleTable">
       <thead>
         <tr id="time-header">
-          <th class="court-name" style="min-width:60px;">Sân</th>
+          <th class="court-name-cell">Sân</th>
         </tr>
       </thead>
       <tbody id="grid-body"></tbody>
     </table>
   </div>
 
-  <div class="bottom-bar">
-    <div class="summary">
-      <span id="total-hours">Tổng giờ: 0h00</span>
-      <span id="total-price">Tổng tiền: 0 đ</span>
+</div>
+
+<!-- Bottom bar -->
+<div class="bottom-bar">
+  <div style="display:flex; gap:32px;">
+    <div class="bottom-summary">
+      <span class="label">Tổng giờ</span>
+      <span class="value" id="total-hours">0h00</span>
     </div>
-    <button class="btn-next" onclick="goToNext()">TIẾP THEO</button>
+    <div class="bottom-summary">
+      <span class="label">Tổng tiền</span>
+      <span class="value" id="total-price">0 đ</span>
+    </div>
   </div>
+  <button class="btn-next" onclick="goToNext()">Tiếp theo →</button>
+</div>
 
-  <script>
-    // Lấy thông tin sân từ URL hoặc localStorage
-    const params      = new URLSearchParams(window.location.search);
-    const courtId     = params.get('courtId')   || localStorage.getItem('bk_courtId')   || '1';
-    const courtName   = params.get('courtName') || localStorage.getItem('bk_courtName') || 'San cau long';
-    const priceHour   = parseFloat(params.get('price') || localStorage.getItem('bk_pricePerHour') || '90000');
+<script src="/js/app.js"></script>
+<script>
+  // Lấy thông tin sân
+  const urlParams  = new URLSearchParams(window.location.search);
+  const courtId    = urlParams.get('courtId')   || localStorage.getItem('bk_courtId')   || '1';
+  const courtName  = urlParams.get('courtName') || localStorage.getItem('bk_courtName') || 'Sân cầu lông';
+  const priceHour  = parseFloat(urlParams.get('price') || localStorage.getItem('bk_pricePerHour') || '90000');
 
-    localStorage.setItem('bk_courtId',      courtId);
-    localStorage.setItem('bk_courtName',    courtName);
-    localStorage.setItem('bk_pricePerHour', priceHour);
+  localStorage.setItem('bk_courtId',      courtId);
+  localStorage.setItem('bk_courtName',    courtName);
+  localStorage.setItem('bk_pricePerHour', priceHour);
 
-    // Ngày mặc định = hôm nay
-    const today = new Date();
-    const dp = document.getElementById('datePicker');
-    dp.min   = today.toISOString().split('T')[0];
-    dp.value = today.toISOString().split('T')[0];
-    updateDateLabel();
+  document.getElementById('courtNameLabel').textContent = courtName;
 
-    dp.addEventListener('change', () => { updateDateLabel(); buildGrid(); });
+  // Ngày mặc định = hôm nay
+  const dp    = document.getElementById('datePicker');
+  const today = new Date().toISOString().split('T')[0];
+  dp.min      = today;
+  dp.value    = today;
+  updateDateLabel();
 
-    function updateDateLabel() {
-      const [y, m, d] = dp.value.split('-');
-      document.getElementById('dateLabel').textContent = d + '/' + m + '/' + y;
-    }
+  dp.addEventListener('change', () => { updateDateLabel(); buildGrid(); });
 
-    const times = [
-      "5:00","5:30","6:00","6:30","7:00","7:30","8:00","8:30",
-      "9:00","9:30","10:00","10:30","11:00","11:30","12:00","12:30",
-      "13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30",
-      "17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30",
-      "21:00","21:30"
-    ];
+  function updateDateLabel() {
+    const [y, m, d] = dp.value.split('-');
+    document.getElementById('dateLabel').textContent = d + '/' + m + '/' + y;
+  }
 
-    // Tên sân từ param (chỉ 1 sân hoặc nhiều tùy)
-    const courtRows = [courtName];
+  const times = [
+    "05:00","05:30","06:00","06:30","07:00","07:30","08:00","08:30",
+    "09:00","09:30","10:00","10:30","11:00","11:30","12:00","12:30",
+    "13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30",
+    "17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30",
+    "21:00","21:30"
+  ];
 
-    // Build header
-    const thRow = document.getElementById('time-header');
-    times.forEach(t => {
-      const th = document.createElement('th');
-      th.textContent = t;
-      thRow.appendChild(th);
+  // Build header columns
+  const thRow = document.getElementById('time-header');
+  times.forEach(t => {
+    const th = document.createElement('th');
+    th.textContent = t;
+    thRow.appendChild(th);
+  });
+
+  async function fetchBookings(date) {
+    try {
+      const resp = await fetch(`/api/bookings?courtId=${courtId}&date=${date}`);
+      const data = await resp.json();
+      return data.success ? data.data : [];
+    } catch (e) { return []; }
+  }
+
+  function parseTime(s) {
+    if (!s) return 0;
+    const [h, m] = s.split(':').map(Number);
+    return h * 60 + (m || 0);
+  }
+
+  async function buildGrid() {
+    const bookings = await fetchBookings(dp.value);
+    const tbody = document.getElementById('grid-body');
+    tbody.innerHTML = '';
+
+    const tr     = document.createElement('tr');
+    const tdName = document.createElement('td');
+    tdName.className   = 'court-name-cell';
+    tdName.textContent = courtName;
+    tr.appendChild(tdName);
+
+    times.forEach((t, idx) => {
+      const td        = document.createElement('td');
+      const slotStart = parseTime(t);
+      const slotEnd   = slotStart + 30;
+
+      const isBooked = bookings.some(b => {
+        if (b.status === 'CANCELLED') return false;
+        return parseTime(b.startTime) < slotEnd && parseTime(b.endTime) > slotStart;
+      });
+
+      if (isBooked) {
+        td.className = 'slot-booked';
+        td.title = 'Đã được đặt';
+      } else {
+        td.className = 'slot-empty';
+        td.dataset.time = t;
+        td.dataset.idx  = idx;
+        td.onclick = function() {
+          this.className = this.className === 'slot-empty' ? 'slot-selected' : 'slot-empty';
+          calcTotal();
+        };
+      }
+      tr.appendChild(td);
     });
 
-    function buildGrid() {
-      const tbody = document.getElementById('grid-body');
-      tbody.innerHTML = '';
-      courtRows.forEach(c => {
-        const tr = document.createElement('tr');
-        const tdName = document.createElement('td');
-        tdName.className = 'court-name';
-        tdName.textContent = c;
-        tr.appendChild(tdName);
-        times.forEach((t, idx) => {
-          const td = document.createElement('td');
-          const rand = Math.random();
-          if (rand < 0.25) {
-            td.className = 'slot booked';
-          } else {
-            td.className = 'slot empty';
-            td.dataset.time = t;
-            td.dataset.idx  = idx;
-            td.onclick = function() {
-              this.classList.toggle('selected');
-              calcTotal();
-            };
-          }
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-      // Reset lựa chọn
+    tbody.appendChild(tr);
+    localStorage.removeItem('bk_price');
+    calcTotal();
+  }
+
+  buildGrid();
+
+  function calcTotal() {
+    const selected = Array.from(document.querySelectorAll('.slot-selected'));
+    const count    = selected.length;
+    const mins     = count * 30;
+    const h        = Math.floor(mins / 60);
+    const mm       = mins % 60;
+    const timeStr  = h + 'h' + String(mm).padStart(2,'0');
+    const total    = Math.round(count * 0.5 * priceHour);
+
+    document.getElementById('total-hours').textContent = timeStr;
+    document.getElementById('total-price').textContent = total.toLocaleString('vi-VN') + ' đ';
+
+    if (count > 0) {
+      const idxArr   = selected.map(s => parseInt(s.dataset.idx)).sort((a,b)=>a-b);
+      const startIdx = idxArr[0];
+      const endIdx   = idxArr[idxArr.length - 1] + 1;
+
+      function idxToTime(i) {
+        const total = 5 * 60 + i * 30;
+        return String(Math.floor(total/60)).padStart(2,'0') + ':' + String(total%60).padStart(2,'0');
+      }
+
+      const [y, mo, d] = dp.value.split('-');
+      localStorage.setItem('bk_price',     total);
+      localStorage.setItem('bk_time',      timeStr);
+      localStorage.setItem('bk_dateRaw',   dp.value);
+      localStorage.setItem('bk_date',      d+'/'+mo+'/'+y);
+      localStorage.setItem('bk_startTime', idxToTime(startIdx));
+      localStorage.setItem('bk_endTime',   idxToTime(endIdx));
+    } else {
       localStorage.removeItem('bk_price');
-      calcTotal();
     }
+  }
 
-    buildGrid();
-
-    function calcTotal() {
-      const selectedSlots = Array.from(document.querySelectorAll('.slot.selected'));
-      const count = selectedSlots.length;
-      const m  = count * 30;
-      const h  = Math.floor(m / 60);
-      const mm = m % 60;
-      const timeStr = h + 'h' + (mm > 0 ? mm : '00');
-      const total   = Math.round((count * 0.5) * priceHour); // 0.5h per slot
-
-      document.getElementById('total-hours').innerText = 'Tong gio: ' + timeStr;
-      document.getElementById('total-price').innerText = 'Tong tien: ' + total.toLocaleString('vi-VN') + ' d';
-
-      if (count > 0) {
-        // Lấy slot đầu và cuối để tính startTime / endTime
-        const idxArr   = selectedSlots.map(s => parseInt(s.dataset.idx)).sort((a,b) => a-b);
-        const startIdx = idxArr[0];
-        const endIdx   = idxArr[idxArr.length - 1] + 1; // +1 slot = +30min
-
-        function idxToTime(i) {
-          const totalMin = 5 * 60 + i * 30;
-          const hh = Math.floor(totalMin / 60);
-          const mm2 = totalMin % 60;
-          return String(hh).padStart(2,'0') + ':' + String(mm2).padStart(2,'0');
-        }
-
-        const [y, mo, d] = dp.value.split('-');
-
-        localStorage.setItem('bk_price',     total);
-        localStorage.setItem('bk_time',      timeStr);
-        localStorage.setItem('bk_dateRaw',   dp.value);
-        localStorage.setItem('bk_date',      d + '/' + mo + '/' + y);
-        localStorage.setItem('bk_startTime', idxToTime(startIdx));
-        localStorage.setItem('bk_endTime',   idxToTime(endIdx));
-      } else {
-        localStorage.removeItem('bk_price');
-      }
+  function goToNext() {
+    if (!localStorage.getItem('bk_price')) {
+      alert('Vui lòng chọn ít nhất 1 khung giờ trống!');
+      return;
     }
-
-    function goToNext() {
-      if (!localStorage.getItem('bk_price')) {
-        alert('Vui long chon khung gio trong!');
-        return;
-      }
-      window.location.href = 'booking-info.html';
-    }
-  </script>
+    window.location.href = 'booking-info.html';
+  }
+</script>
 </body>
 </html>

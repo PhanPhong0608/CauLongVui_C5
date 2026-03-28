@@ -90,6 +90,66 @@
     }
     .quick-link .ql-text span { font-size: 12px; color: var(--muted); }
 
+    /* ── Booking history ── */
+    .booking-list { display: flex; flex-direction: column; gap: 10px; }
+    .booking-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px; border: 1.5px solid var(--border);
+      border-radius: 14px; cursor: pointer; background: #fff;
+      transition: all .2s;
+    }
+    .booking-item:hover { border-color: var(--green); box-shadow: 0 4px 16px rgba(45,138,78,.1); transform: translateY(-1px); }
+    .booking-item-left { display: flex; flex-direction: column; gap: 4px; }
+    .booking-item-court { font-size: 14px; font-weight: 800; color: var(--dark); }
+    .booking-item-meta  { font-size: 12px; color: var(--muted); }
+    .booking-status-chip {
+      padding: 4px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; white-space: nowrap;
+    }
+    .chip-upcoming  { background: #dbeafe; color: #1d4ed8; }
+    .chip-ongoing   { background: #dcfce7; color: #15803d; }
+    .chip-done      { background: #f1f5f9; color: #94a3b8; }
+    .chip-cancelled { background: #fee2e2; color: #dc2626; }
+    .bk-empty { text-align:center; padding:28px 0; color:var(--muted); font-size:14px; }
+
+    /* ── Detail modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 9999;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 24px;
+      width: 100%; max-width: 480px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.2);
+      overflow: hidden; animation: modalIn .25s ease;
+    }
+    @keyframes modalIn { from { opacity:0; transform:scale(.92); } to { opacity:1; transform:scale(1); } }
+    .modal-header {
+      background: linear-gradient(135deg, #1a3c2e, #2d8a4e);
+      padding: 28px 28px 20px; color: #fff;
+    }
+    .modal-header h3 { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+    .modal-header p  { font-size: 13px; opacity:.75; }
+    .modal-body { padding: 24px 28px; }
+    .modal-row {
+      display: flex; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+    }
+    .modal-row:last-child { border-bottom: none; }
+    .modal-row .ml { color: var(--muted); font-weight: 600; }
+    .modal-row .mv { font-weight: 700; color: var(--dark); text-align: right; }
+    .modal-footer { padding: 0 28px 24px; }
+    .modal-btn-close {
+      width: 100%; padding: 12px; border-radius: 12px;
+      border: 1.5px solid #e5e7eb; background: #fff;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: inherit; transition: all .2s;
+    }
+    .modal-btn-close:hover { background: #f1f5f9; }
+
     /* ── Logout button ── */
     .logout-btn {
       display: flex; align-items: center; gap: 10px;
@@ -140,29 +200,29 @@
 
     <!-- Thông tin tài khoản -->
     <div class="info-card">
-      <h2>👤 Thông tin tài khoản</h2>
+      <h2>Thông tin tài khoản</h2>
 
       <div class="info-row">
-        <span class="info-label">📛 Họ và tên</span>
+        <span class="info-label">Họ và tên</span>
         <span class="info-value" id="infoName">—</span>
       </div>
       <div class="info-row">
-        <span class="info-label">📧 Email</span>
+        <span class="info-label">Email</span>
         <span class="info-value" id="infoEmail">—</span>
       </div>
       <div class="info-row">
-        <span class="info-label">📞 Số điện thoại</span>
+        <span class="info-label">Số điện thoại</span>
         <span class="info-value" id="infoPhone">—</span>
       </div>
       <div class="info-row">
-        <span class="info-label">🔐 Vai trò</span>
+        <span class="info-label">Vai trò</span>
         <span class="info-value" id="infoRole">—</span>
       </div>
     </div>
 
     <!-- Truy cập nhanh -->
     <div class="info-card">
-      <h2>⚡ Truy cập nhanh</h2>
+      <h2>Truy cập nhanh</h2>
       <div class="quick-links">
         <a href="/my-bookings.html" class="quick-link">
           <div class="ql-icon">🏸</div>
@@ -202,11 +262,41 @@
       </div>
     </div>
 
+    <!-- Lịch sử đặt sân -->
+    <div class="info-card" id="bookingHistoryCard" style="display:none;">
+      <h2>Lịch sử đặt sân</h2>
+      <div class="booking-list" id="bookingList">
+        <div class="bk-empty">Đang tải...</div>
+      </div>
+    </div>
+
     <!-- Đăng xuất -->
     <button class="logout-btn" onclick="confirmLogout()">
-      🚪 Đăng xuất khỏi tài khoản
+      Đăng xuất khỏi tài khoản
     </button>
 
+  </div>
+</div>
+
+<!-- Booking detail modal -->
+<div class="modal-overlay" id="bookingModal" onclick="closeModalOverlay(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3 id="modal-court">—</h3>
+      <p  id="modal-status-text">—</p>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row"><span class="ml">Ngày đặt</span>    <span class="mv" id="modal-date">—</span></div>
+      <div class="modal-row"><span class="ml">Giờ bắt đầu</span> <span class="mv" id="modal-start">—</span></div>
+      <div class="modal-row"><span class="ml">Giờ kết thúc</span><span class="mv" id="modal-end">—</span></div>
+      <div class="modal-row"><span class="ml">Khách hàng</span>  <span class="mv" id="modal-name">—</span></div>
+      <div class="modal-row"><span class="ml">Số điện thoại</span><span class="mv" id="modal-phone">—</span></div>
+      <div class="modal-row"><span class="ml">Tổng tiền</span>   <span class="mv" id="modal-price">—</span></div>
+      <div class="modal-row"><span class="ml">Trạng thái</span>  <span class="mv" id="modal-status">—</span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-close" onclick="closeModalBtn()">Đóng</button>
+    </div>
   </div>
 </div>
 
@@ -233,9 +323,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fullNameEl').textContent = user.fullName || 'Người dùng';
 
   const roleMap = {
-    ADMIN:    '👑 Quản trị viên',
-    STAFF:    '🛠️ Nhân viên',
-    CUSTOMER: '🧍 Khách hàng',
+    ADMIN:    'Quản trị viên',
+    STAFF:    'Nhân viên',
+    CUSTOMER: 'Khách hàng',
   };
   document.getElementById('roleBadgeEl').textContent = roleMap[user.role] || user.role;
 
@@ -244,7 +334,101 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('infoEmail').textContent = user.email     || '—';
   document.getElementById('infoPhone').textContent = user.phone     || '—';
   document.getElementById('infoRole').textContent  = roleMap[user.role] || user.role || '—';
+
+  // Booking history
+  if (user.phone) {
+    loadBookingHistory(user.phone);
+  }
 });
+
+// ── Fetch & render booking history ──
+async function loadBookingHistory(phone) {
+  try {
+    const res  = await fetch(`/api/bookings?phone=${encodeURIComponent(phone)}`);
+    const json = await res.json();
+    const bookings = (json.success && json.data) ? json.data : [];
+
+    const card = document.getElementById('bookingHistoryCard');
+    const list = document.getElementById('bookingList');
+    card.style.display = 'block';
+
+    if (bookings.length === 0) {
+      list.innerHTML = '<div class="bk-empty">Bạn chưa có lịch đặt sân nào.</div>';
+      return;
+    }
+
+    // Sort: newest first
+    bookings.sort((a, b) => {
+      const da = a.bookingDate + 'T' + a.startTime;
+      const db = b.bookingDate + 'T' + b.startTime;
+      return db.localeCompare(da);
+    });
+
+    list.innerHTML = bookings.map(b => {
+      const { cls, label } = getStatusInfo(b);
+      const dateStr = formatDateVN(b.bookingDate);
+      const timeStr = fmtTime(b.startTime) + ' › ' + fmtTime(b.endTime);
+      return `
+        <div class="booking-item" onclick='openModal(${JSON.stringify(b)})'>
+          <div class="booking-item-left">
+            <span class="booking-item-court">🏸 ${b.courtName}</span>
+            <span class="booking-item-meta">${dateStr} &nbsp;·&nbsp; ${timeStr}</span>
+          </div>
+          <span class="booking-status-chip ${cls}">${label}</span>
+        </div>`;
+    }).join('');
+  } catch (e) {
+    document.getElementById('bookingList').innerHTML =
+      '<div class="bk-empty">Không thể tải lịch sử. Vui lòng thử lại.</div>';
+  }
+}
+
+// ── Time-based status ──
+function getStatusInfo(b) {
+  if (b.status === 'CANCELLED') return { cls: 'chip-cancelled', label: 'Đã hủy' };
+  const now  = new Date();
+  const date = b.bookingDate; // "YYYY-MM-DD"
+  const start = new Date(date + 'T' + b.startTime);
+  const end   = new Date(date + 'T' + b.endTime);
+  if (now < start) return { cls: 'chip-upcoming',  label: 'Sắp tới' };
+  if (now <= end)  return { cls: 'chip-ongoing',   label: 'Đang diễn ra' };
+  return              { cls: 'chip-done',    label: 'Đã kết thúc' };
+}
+
+// ── Modal ──
+function openModal(b) {
+  const { label } = getStatusInfo(b);
+  document.getElementById('modal-court').textContent       = '🏸 ' + b.courtName;
+  document.getElementById('modal-status-text').textContent = label;
+  document.getElementById('modal-date').textContent        = formatDateVN(b.bookingDate);
+  document.getElementById('modal-start').textContent       = fmtTime(b.startTime);
+  document.getElementById('modal-end').textContent         = fmtTime(b.endTime);
+  document.getElementById('modal-name').textContent        = b.customerName;
+  document.getElementById('modal-phone').textContent       = b.customerPhone;
+  document.getElementById('modal-price').textContent       = (b.totalPrice || 0).toLocaleString('vi-VN') + ' đ';
+  const statusLabels = { PENDING:'⏳ Chờ xác nhận', CONFIRMED:'✅ Đã xác nhận', CANCELLED:'❌ Đã hủy', COMPLETED:'🏆 Hoàn thành' };
+  document.getElementById('modal-status').textContent      = statusLabels[b.status] || b.status;
+  document.getElementById('bookingModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModalBtn()          { closeModal(); }
+function closeModalOverlay(e)     { if (e.target === e.currentTarget) closeModal(); }
+function closeModal()             {
+  document.getElementById('bookingModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Helpers ──
+function formatDateVN(dateStr) {
+  if (!dateStr) return '—';
+  const [y, m, d] = dateStr.split('-');
+  return `${d}/${m}/${y}`;
+}
+function fmtTime(t) {
+  if (!t) return '—';
+  return t.substring(0, 5);
+}
 
 function confirmLogout() {
   if (confirm('Bạn có chắc muốn đăng xuất không?')) logout();

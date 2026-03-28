@@ -22,9 +22,12 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<BookingDTO>>> getAllBookings(
             @RequestParam(required = false) Long courtId,
-            @RequestParam(required = false) String phone) {
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date) {
         List<BookingDTO> bookings;
-        if (courtId != null) {
+        if (courtId != null && date != null) {
+            bookings = bookingService.getBookingsByCourtAndDate(courtId, date);
+        } else if (courtId != null) {
             bookings = bookingService.getBookingsByCourtId(courtId);
         } else if (phone != null && !phone.isBlank()) {
             bookings = bookingService.getBookingsByPhone(phone);

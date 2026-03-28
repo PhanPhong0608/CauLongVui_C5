@@ -51,6 +51,13 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<BookingDTO> getBookingsByCourtAndDate(Long courtId, java.time.LocalDate date) {
+        return bookingRepository.findByCourtIdAndBookingDate(courtId, date).stream()
+                .map(BookingDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     public BookingDTO createBooking(BookingDTO bookingDTO) {
         // Validate court exists
         Court court = courtRepository.findById(bookingDTO.getCourtId())
