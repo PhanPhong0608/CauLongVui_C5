@@ -27,7 +27,7 @@ public class AuthController {
                 .body(ApiResponse.success(response.getMessage(), response));
     }
 
-    // POST /api/auth/login — Đăng nhập
+    // POST /api/auth/login — Đăng nhập bằng email/password
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(
             @Valid @RequestBody LoginRequest req) {
@@ -35,7 +35,7 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(response.getMessage(), response));
     }
 
-    // GET /api/auth/me?id={id} — Lấy thông tin user (dùng khi reload trang)
+    // GET /api/auth/me?id={id} — Lấy thông tin user (dùng khi reload trang hoặc sau OAuth2)
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<AuthResponse>> getMe(@RequestParam Long id) {
         AuthResponse response = authService.getById(id);
