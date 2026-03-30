@@ -34,3 +34,9 @@ build/
 
 ### Logs ###
 *.log
+
+### Secrets - Local config (KHÔNG commit lên git) ###
+src/main/resources/application-local.properties
+
+### User uploads ###
+src/main/resources/static/uploads/

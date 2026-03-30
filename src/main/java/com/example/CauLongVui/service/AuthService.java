@@ -43,6 +43,11 @@ public class AuthService {
             throw new IllegalArgumentException("Tài khoản của bạn đã bị vô hiệu hóa");
         }
 
+        // Tài khoản Google không có password — yêu cầu đăng nhập bằng Google
+        if (user.getProvider() != User.Provider.LOCAL || user.getPassword() == null) {
+            throw new IllegalArgumentException("Tài khoản này được đăng ký bằng Google. Vui lòng nhấn \"Tiếp tục với Google\" để đăng nhập.");
+        }
+
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Email hoặc mật khẩu không chính xác");
         }
